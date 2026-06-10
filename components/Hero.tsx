@@ -6,12 +6,10 @@ import {
   CheckCircle, 
   ShieldCheck, 
   Clock, 
-  MessageCircle, 
-  MapPin, 
-  Calendar, 
-  Users 
+  MessageCircle
 } from "lucide-react";
 import FlightSearchWidget from "./FlightSearchWidget";
+import HotelSearchWidget from "./HotelSearchWidget"; // <-- Added this import
 
 export default function Hero() {
   const [activeTab, setActiveTab] = useState<"flights" | "hotels">("flights");
@@ -90,52 +88,7 @@ export default function Hero() {
           {activeTab === "flights" ? (
             <FlightSearchWidget />
           ) : (
-            <div className="flex-1 flex flex-col justify-between animate-in fade-in duration-300">
-              {/* Hotel Form Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                
-                {/* Destination / Area */}
-                <div className="bg-[#1e293b] p-3 rounded border border-gray-700 md:col-span-2 flex justify-between items-center focus-within:border-[#ff6b00] transition">
-                  <div className="w-full">
-                    <p className="text-xs text-gray-400">City, property name or location</p>
-                    <input type="text" placeholder="Where are you going?" className="w-full bg-transparent text-white font-semibold outline-none mt-1 placeholder-gray-500" />
-                  </div>
-                  <MapPin size={18} className="text-gray-400"/>
-                </div>
-
-                {/* Check-in */}
-                <div className="bg-[#1e293b] p-3 rounded border border-gray-700 flex justify-between items-center focus-within:border-[#ff6b00] transition">
-                  <div className="w-full">
-                    <p className="text-xs text-gray-400">Check-in</p>
-                    <input type="text" defaultValue="May 25, 2026" className="w-full bg-transparent text-white font-semibold outline-none mt-1" />
-                  </div>
-                  <Calendar size={16} className="text-gray-400"/>
-                </div>
-
-                {/* Check-out */}
-                <div className="bg-[#1e293b] p-3 rounded border border-gray-700 flex justify-between items-center focus-within:border-[#ff6b00] transition">
-                  <div className="w-full">
-                    <p className="text-xs text-gray-400">Check-out</p>
-                    <input type="text" defaultValue="Jun 02, 2026" className="w-full bg-transparent text-white font-semibold outline-none mt-1" />
-                  </div>
-                  <Calendar size={16} className="text-gray-400"/>
-                </div>
-
-                {/* Rooms and Guests */}
-                <div className="bg-[#1e293b] p-3 rounded border border-gray-700 md:col-span-2 flex justify-between items-center focus-within:border-[#ff6b00] transition">
-                  <div className="w-full">
-                    <p className="text-xs text-gray-400">Rooms and Guests</p>
-                    <input type="text" defaultValue="1 Room, 2 Adults, 0 Children" className="w-full bg-transparent text-white font-semibold outline-none mt-1" />
-                  </div>
-                  <Users size={18} className="text-gray-400"/>
-                </div>
-                
-              </div>
-
-              <button className="w-full bg-[#ff6b00] hover:bg-[#e66000] text-white py-4 rounded-md font-bold text-lg flex items-center justify-center space-x-2 transition mt-auto shadow-lg shadow-[#ff6b00]/20">
-                <Building size={20} /> <span>SEARCH HOTELS</span>
-              </button>
-            </div>
+            <HotelSearchWidget /> /* <-- This triggers your new, fully functional component! */
           )}
 
           <div className="text-center mt-4 text-xs text-gray-500">
