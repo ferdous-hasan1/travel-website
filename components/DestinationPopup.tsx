@@ -1,25 +1,6 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Search } from "lucide-react";
-
-const airportData = [
-  "Kolkata Netaji Subhash Chandra Bose Airport (CCU)",
-  "New Delhi Indira Gandhi International Airport (DEL)",
-  "Mumbai Chhatrapati Shivaji Maharaj International Airport (BOM)",
-  "Bengaluru Kempegowda International Airport (BLR)",
-  "Chennai International Airport (MAA)",
-  "New York John F. Kennedy International Airport (JFK)",
-  "London Heathrow Airport (LHR)",
-  "Dubai International Airport (DXB)",
-  "Tokyo Haneda Airport (HND)",
-  "Paris Charles de Gaulle Airport (CDG)",
-  "Manila Ninoy Aquino International Airport (MNL)",
-  "Kuala Lumpur International Airport (KUL)",
-  "Colombo Bandaranaike International Airport (CMB)",
-  "Bali Ngurah Rai International Airport (DPS)",
-  "Tbilisi International Airport (TBS)",
-  // Add the rest of your 200 airports here...
-];
 
 const defaultSuggestions = [
   {
@@ -28,7 +9,7 @@ const defaultSuggestions = [
   },
   {
     category: "Visa-Free / E-Visa",
-    items: ["Manila", "Male", "Kuala Lumpur", "Colombo", "Denpasar", "Tbilisi"]
+    items: ["Manila (MNL)", "Kuala Lumpur (KUL)", "Colombo (CMB)", "Denpasar (DPS)", "Tbilisi (TBS)"]
   }
 ];
 
@@ -38,10 +19,36 @@ interface DestinationPopupProps {
 
 export default function DestinationPopup({ onSelect }: DestinationPopupProps) {
   const [searchQuery, setSearchQuery] = useState("");
-  
-  const filteredAirports = airportData.filter((airport) =>
-    airport.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const [results, setResults] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!searchQuery) {
+      setResults([]);
+      return;
+    }
+
+    const fetchAirports = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch(`/api/duffel/airports?query=${encodeURIComponent(searchQuery)}`);
+        const json = await response.json();
+        if (json.data) {
+          setResults(json.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch airports:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const debounceTimer = setTimeout(() => {
+      fetchAirports();
+    }, 300);
+
+    return () => clearTimeout(debounceTimer);
+  }, [searchQuery]);
 
   return (
     <div className="absolute top-full left-0 mt-2 w-[320px] bg-[#1e293b] border border-gray-600 rounded-xl shadow-2xl z-[60] p-4 animate-in fade-in zoom-in-95 duration-200">
@@ -60,14 +67,20 @@ export default function DestinationPopup({ onSelect }: DestinationPopupProps) {
       <div className="max-h-[250px] overflow-y-auto hide-scrollbar pr-1">
         {searchQuery.length > 0 ? (
           <div className="flex flex-col gap-2">
-            {filteredAirports.length > 0 ? (
-              filteredAirports.map((airport, idx) => (
+            {loading ? (
+              <p className="text-gray-400 text-sm text-center py-4 animate-pulse">Searching...</p>
+            ) : results.length > 0 ? (
+              results.map((place, idx) => (
                 <button 
                   key={idx} 
-                  onClick={(e) => { e.stopPropagation(); onSelect(airport); }} 
-                  className="bg-[#111827] border border-gray-700 hover:border-[#ff6b00] hover:text-[#ff6b00] text-gray-300 py-2 px-3 text-xs rounded-lg transition-colors text-left"
+                  onClick={(e) => { 
+                    e.stopPropagation(); 
+                    onSelect(`${place.name} (${place.iata_code})`); 
+                  }} 
+                  className="bg-[#111827] border border-gray-700 hover:border-[#ff6b00] hover:text-[#ff6b00] text-gray-300 py-2 px-3 text-xs rounded-lg transition-colors text-left flex justify-between items-center"
                 >
-                  {airport}
+                  <span className="truncate mr-2">{place.name}</span>
+                  <span className="text-[#ff6b00] font-bold shrink-0">{place.iata_code}</span>
                 </button>
               ))
             ) : (
